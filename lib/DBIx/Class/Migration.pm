@@ -193,7 +193,6 @@ sub dbic_dh {
   _log_die "A \$VERSION needs to be specified in your schema class ${\$self->_infer_schema_class}"
   unless $self->schema->schema_version;
 
-
   my $dh = $self->deployment_handler_class->new({
     schema => $self->schema,
     %dbic_dh_args, @args,
@@ -212,7 +211,9 @@ sub upgrade { shift->dbic_dh->upgrade }
 sub downgrade {
   my ($self, %args) = @_;
   unless($self->dbic_dh_args->{to_version}) {
-    my $to_version = $self->dbic_dh->schema_version - 1;
+    my $to_version = $self->dbic_dh->schema_version;
+    $to_version = $to_version->numify if ref $to_version; # version object
+    $to_version -= 1;
     warn "No to_version is specified, downgrading to version $to_version";
     $args{to_version} = $to_version;
   }
@@ -287,7 +288,11 @@ sub _create_all_fixture_set {
   _create_file_at_path($path, $conf);
 }
 
-sub _has_previous_version { $_[0] ? $_[0]-1 : 0 }
+sub _has_previous_version {
+  return 0 if !$_[0];
+  return $_[0]->numify - 1 if ref $_[0]; # version object
+  $_[0]-1
+}
 
 sub _only_from_when_not_to {
   my ($from_dir, $to_dir) = @_;

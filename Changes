@@ -1,5 +1,7 @@
 Revision history for DBIx-Class-Migration.
 
+        - handle "package NAME VERSION" - thanks @kivilahtio for report
+
 0.062   
         - update DBIx::Class::DeploymentHandler dep to 0.002222 - thanks @KES777 for report
         - POD improvements - thanks @manwar
